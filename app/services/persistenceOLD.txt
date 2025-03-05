@@ -1,0 +1,67 @@
+import type { Todo } from "~/data/Todo";
+
+// Janky local storage persistence that acts a bit like a relational db
+// perhaps i will flesh it out slightly more to support multiple tables
+
+export interface Context {
+    todos: Todo[],
+    nextId: number
+}
+
+const localStorageKey = "todoneContext";
+
+export function addTodo(todo: Todo) {
+    const ctx = loadCtx();
+
+    todo.id = ctx.nextId; // intentionally mutate so that consumer knows what the id is
+    ctx.todos.push(todo);
+    ctx.nextId ++;
+
+    saveCtx(ctx);
+}
+
+export function getTodos(): Todo[] {
+    const ctx = loadCtx();
+    return ctx.todos;
+}
+
+export function getTodo(id: number): Todo | null {
+    const ctx = loadCtx();
+    return ctx.todos.filter(t => t.id == id)[0] || null;
+}
+
+export function updateTodo(todo: Todo): boolean {
+    const ctx = loadCtx();
+    let index = ctx.todos.findIndex(t => t.id == todo.id);
+    if (index == -1) return false;
+    
+    ctx.todos[index] = todo;
+
+    saveCtx(ctx);
+    return true;
+}
+
+export function deleteTodo(id: number): boolean {
+    const ctx = loadCtx();
+    let index = ctx.todos.findIndex(t => t.id == id);
+    if (index == -1) return false;
+
+    ctx.todos.splice(index, 1);
+
+    saveCtx(ctx);
+    return true;
+}
+
+
+
+function loadCtx() {
+    if (! (localStorageKey in localStorage)) return {
+        todos: [],
+        nextId: 1
+    }
+    return JSON.parse(localStorage[localStorageKey]) as Context;
+}
+
+function saveCtx(ctx: Context) {
+    localStorage[localStorageKey] = JSON.stringify(ctx);
+}
