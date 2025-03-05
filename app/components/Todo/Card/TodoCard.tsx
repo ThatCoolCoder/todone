@@ -1,4 +1,4 @@
-import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { ArrowTopRightOnSquareIcon, PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { Card, Group, Text, Stack, Button, CheckIcon, TextInput } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useContext, useState } from "react";
@@ -7,6 +7,7 @@ import db from "~/services/database";
 import { TodosContext } from "~/context/TodosContext";
 import EditTodoThing from "./EditTodoThing";
 import { StateSetter } from "~/data/StateSetter";
+import { useNavigate } from "react-router";
 
 const bannedSelectors = ["input", "button", "a", "input *", "button *", "a *"];
 
@@ -19,9 +20,6 @@ export type TodoEdit = {
 export default function TodoCard({ todo }: { todo: Todo }) {
     const [open, setOpen] = useState(false);
     const [edit, setEdit] = useState(false);
-
-
-    const allTodos = useContext(TodosContext);
 
     return <Card onClick={e => {
             // prevent clicking on internal buttons from doing stuff, might make this a utility function in future
@@ -39,6 +37,8 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
     const [editVals, setEditVals] = useState({title: todo.title, body: todo.body, done: todo.done})
 
     const allTodos = useContext(TodosContext);
+
+    const navigate = useNavigate();
 
     function updateTodo() {
         let newTodo = {...todo, ...editVals};
@@ -61,6 +61,10 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
                 allTodos.set(clone);
             }
         })
+    }
+
+    function openHistory() {
+        navigate(`/app/todos/${todo.id}/history`);
     }
 
     return <>
@@ -87,6 +91,7 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
                     :
                     <Button onClick={() => setEdit(true)} color="white" variant="outline" size="compact-md"><PencilIcon className="size-6" /></Button>
                 }
+                <Button onClick={openHistory} variant="outline" color="white" role="anchor"><ArrowTopRightOnSquareIcon className="size-6" /></Button>
             </Stack>
         </Group>
     </>

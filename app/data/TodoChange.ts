@@ -1,11 +1,11 @@
 export interface TodoChange {
     id: number,
     todoId: number,
-    type: TodoEditType,
+    type: TodoChangeType,
     timestamp: number
 }
 
-export type TodoEditType = "CREATED" | "EDITED";
+export type TodoChangeType = "CREATED" | "EDITED";
 
 export interface TodoCreated extends TodoChange {
     // no extra data

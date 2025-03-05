@@ -65,12 +65,12 @@ export class TableMeta<TItem extends IHasId, TCtx> {
 
     public async add(item: TItem): Promise<boolean> {
         return await this.actionManager.queue(() => {
-            if (this.shouldSkipOperation(this.overrides.onAdd, item)) return false;
-
+            
             const ctx = this.loadCtx();
             const table = this.getTable(ctx);
             
             item.id = table.nextId;
+            if (this.shouldSkipOperation(this.overrides.onAdd, item)) return false;
             table.items.push(item);
             table.nextId ++;
 

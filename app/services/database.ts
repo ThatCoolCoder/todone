@@ -1,5 +1,5 @@
 import { Todo } from "~/data/Todo";
-import { Table, TableMeta } from "./persistenceServices";
+import { Table, TableMeta } from "./databaseLibrary";
 import { TodoChange, TodoEdited } from "~/data/TodoChange";
 import { ActionManager } from "./actionManager";
 
@@ -19,7 +19,7 @@ class TodoneContext {
     changes = new Table<TodoChange>();
 }
 
-const actionManager = new ActionManager(false);
+const actionManager = new ActionManager();
 
 const db = {
     todos: new TableMeta<Todo, TodoneContext>(c => c.todos, load, save, actionManager, {
@@ -43,11 +43,19 @@ const db = {
                     type: "EDITED",
                     timestamp: timestamp,
                     field: field,
-                    oldValue: JSON.stringify(old[field]),
-                    newValue: JSON.stringify(curr[field])
+                    oldValue: String(old[field]),
+                    newValue: String(curr[field])
                 };
                 db.changes.add(change);
             }
+        },
+        onDelete: todo => {
+            // cascading delete
+            db.changes.getAll().then(changes => {
+                changes
+                    .filter(c => c.todoId == todo.id)
+                    .forEach(c => db.changes.delete(c.id));
+            })
         }
     }),
     changes: new TableMeta<TodoChange, TodoneContext>(c => c.changes, load, save, actionManager),

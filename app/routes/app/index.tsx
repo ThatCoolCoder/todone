@@ -1,13 +1,13 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
-import { Button, Checkbox, Group, TextInput, Textarea, Stack } from "@mantine/core";
-import { useContext, useEffect, useState } from "react";
+import { Button, Group } from "@mantine/core";
+import { modals } from '@mantine/modals';
+import { useEffect, useState } from "react";
+
+import AddTodoPopup from "~/components/Todo/AddTodoPopup";
 import TodoList from "~/components/Todo/TodoList";
 import { TodosContext } from "~/context/TodosContext";
-import { modals } from '@mantine/modals';
-import db from "~/services/database";
-import AddTodoPopup from "~/components/Todo/AddTodoPopup";
-import { ModalsProvider } from "@mantine/modals";
 import { Todo } from "~/data/Todo";
+import db from "~/services/database";
 
 export default function Index() {
     let [val, set] = useState([] as Todo[]);

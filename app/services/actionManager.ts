@@ -5,7 +5,7 @@ export type Action = {
 }
 
 export class ActionManager {
-    constructor(logging: boolean) {
+    constructor(logging = false) {
         this.logging = logging;
     }
 
