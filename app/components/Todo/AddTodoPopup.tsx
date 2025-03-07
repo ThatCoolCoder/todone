@@ -1,5 +1,5 @@
 import {Stack, Group, TextInput, Textarea, Checkbox, Button} from "@mantine/core";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { modals } from '@mantine/modals';
 import db from "~/services/database";
 import { StateBundle } from "~/data/StateBundle";

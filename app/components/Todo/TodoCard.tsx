@@ -1,36 +1,26 @@
 import { ArrowTopRightOnSquareIcon, PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { Card, Group, Text, Stack, Button, CheckIcon, TextInput } from "@mantine/core";
+import { Group, Text, Stack, Button, CheckIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useContext, useState } from "react";
 import type { Todo } from "~/data/Todo";
 import db from "~/services/database";
 import { TodosContext } from "~/context/TodosContext";
-import EditTodoThing from "./EditTodoThing";
+import EditTodo from "./EditTodo";
 import { StateSetter } from "~/data/StateSetter";
 import { useNavigate } from "react-router";
-
-const bannedSelectors = ["input", "button", "a", "input *", "button *", "a *"];
-
-export type TodoEdit = {
-    title: string,
-    body: string,
-    done: boolean
-}
+import OpenableCard from "../Misc/OpenableCard";
 
 export default function TodoCard({ todo }: { todo: Todo }) {
-    const [open, setOpen] = useState(false);
     const [edit, setEdit] = useState(false);
 
-    return <Card onClick={e => {
-            // prevent clicking on internal buttons from doing stuff, might make this a utility function in future
-            if (bannedSelectors.some(s => (e.target as HTMLElement).matches(s))) return;
-            if (edit) return;
-            e.preventDefault();
-            setOpen(!open);
-        }}>
-        {!open && <BodyClosed todo={todo} />}
-        {open && <BodyOpen todo={todo} edit={edit} setEdit={setEdit} />}
-    </Card>
+    return <OpenableCard>
+        <OpenableCard.Open>
+            <BodyOpen todo={todo} edit={edit} setEdit={setEdit} />
+        </OpenableCard.Open>
+        <OpenableCard.Closed>
+            <BodyClosed todo={todo} />
+        </OpenableCard.Closed>
+    </OpenableCard>
 }
 
 function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: StateSetter<boolean>}) {
@@ -70,11 +60,9 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
     return <>
         <Group>
             <Stack flex={1}>
-                {edit ? 
-                    <>
-                        <EditTodoThing data={{val: editVals, set: setEditVals}} />
-                    </> :
-                    <>
+                {edit ? <>
+                        <EditTodo data={{val: editVals, set: setEditVals}} />
+                    </> : <>
                         <Text fz="xl">{todo.title}</Text>
                         <Text c="dimmed">{todo.done ? "done" : "not done"}</Text>
                         <Text>{todo.body || "(No body)"}</Text>

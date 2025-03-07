@@ -1,7 +1,7 @@
 import { Grid, Text } from "@mantine/core";
 import { useContext } from "react";
 import { TodosContext } from "~/context/TodosContext";
-import TodoCard from "./Card/TodoCard";
+import TodoCard from "./TodoCard";
 
 export default function TodoList({hideDone}: {hideDone: boolean}) {
     const allTodos = useContext(TodosContext);

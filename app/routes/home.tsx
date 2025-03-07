@@ -3,15 +3,8 @@ import type { Route } from "./+types/home";
 
 import "./home.css";
 
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: "New React Router App" },
-        { name: "description", content: "Welcome to React Router!" },
-    ];
-}
-
 export default function Home() {
-    // const a = ;
+    document.title = "Todone";
 
     return <div className="home-body flex flex-col justify-center h-screen">
         <div className="container max-w-screen-xl mx-auto my-auto p-10">

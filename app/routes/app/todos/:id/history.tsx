@@ -1,6 +1,6 @@
 import { Card, Checkbox, Grid, Stack, Text } from "@mantine/core";
 import { useEffect, useState } from "react"
-import { RouteProps } from "react-router";
+import { Link, RouteProps } from "react-router";
 import { Todo } from "~/data/Todo"
 import { TodoChange, TodoChangeType, TodoEdited } from "~/data/TodoChange";
 import db from "~/services/database";
@@ -8,6 +8,8 @@ import { Route } from "../../+types";
 import { groupBy } from "~/services/misc";
 
 export default function History(loaderData: Route.ComponentProps) {
+    document.title = "History | Todone"
+
     const [todo, setTodo] = useState(null as Todo | null);
     const [changes, setChanges] = useState(null as TodoChange[] | null)
 
@@ -21,7 +23,7 @@ export default function History(loaderData: Route.ComponentProps) {
     }, []);
 
     return <>
-        <p className="text-3xl">History for <b>"{todo?.title ?? "---"}"</b></p>
+        <p className="text-3xl">History for <Link to="/app/"><b>"{todo?.title ?? "---"}"</b></Link></p>
         <br />
         {changes == null ? <>
             Loading change list
@@ -35,32 +37,35 @@ export default function History(loaderData: Route.ComponentProps) {
     </>
 }
 
-type Edit = {
+type FieldEdit = {
     field: string,
     oldValue: string,
     newValue: string,
 }
 
-type EditSet = {
+type FieldEditSet = {
     timestamp: number,
     type: TodoChangeType,
-    changes: Edit[]
+    changes: FieldEdit[]
 }
 
 function ChangeList({changes}: {changes: TodoChange[]}) {
     const [mostRecentFirst, setMostRecentFirst] = useState(true);
 
-    const editSets: EditSet[] = groupBy(changes, c => c.timestamp.toString() + "-" + c.type)
+    const editSets: FieldEditSet[] = 
+        groupBy(changes, c => c.timestamp.toString() + "-" + c.type) // group by time
         .map(group => ({
+            // convert 
             timestamp: group.items[0].timestamp,
             type: group.items[0].type,
             changes: group.items[0].type == "CREATED"
-                ? [] as Edit[]
+                ? [] as FieldEdit[] // if created, no fields were changed
+                // if edited, 
                 : group.items.map(i => ( {
                     field: (i as TodoEdited).field,
                     oldValue: (i as TodoEdited).oldValue,
                     newValue: (i as TodoEdited).newValue,
-                } as Edit)
+                } as FieldEdit)
             )}
         ))
 
@@ -73,13 +78,12 @@ function ChangeList({changes}: {changes: TodoChange[]}) {
         <Checkbox label="Display most recent first?" checked={mostRecentFirst} onChange={e => setMostRecentFirst(e.target.checked)} />
         <br />
         <Grid>
-            {sorted.map(set => <EditSetDetails set={set}/>
-            )}
+            {sorted.map(set => <EditSetDetails set={set}/> )}
         </Grid>
     </>
 }
 
-function EditSetDetails({set}: {set: EditSet}) {
+function EditSetDetails({set}: {set: FieldEditSet}) {
     return <Grid.Col key={set.timestamp}>
         <Card>
             <Stack>
@@ -93,7 +97,7 @@ function EditSetDetails({set}: {set: EditSet}) {
     </Grid.Col>
 }
 
-function EditDetails({edit}: {edit: Edit}) {
+function EditDetails({edit}: {edit: FieldEdit}) {
     return <>
         <Text>{edit.field} changed from "{edit.oldValue}" {"->"} "{edit.newValue}"</Text>
     </>

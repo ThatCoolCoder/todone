@@ -1,8 +1,13 @@
 import { TextInput, Textarea, Checkbox } from "@mantine/core";
 import { StateBundle } from "~/data/StateBundle";
-import { TodoEdit } from "./TodoCard";
 
-export default function EditTodoThing({data}: {data: StateBundle<TodoEdit>}) {
+export type TodoEditData = {
+    title: string,
+    body: string,
+    done: boolean
+}
+
+export default function EditTodo({data}: {data: StateBundle<TodoEditData>}) {
     return <>
         <TextInput placeholder="Title of todo" width="30ch" fz="xl"
             value={data.val.title}

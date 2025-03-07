@@ -9,7 +9,10 @@ import { TodosContext } from "~/context/TodosContext";
 import { Todo } from "~/data/Todo";
 import db from "~/services/database";
 
+
 export default function Index() {
+    document.title = "Todos | Todone";
+
     let [val, set] = useState([] as Todo[]);
 
     useEffect(() => {
