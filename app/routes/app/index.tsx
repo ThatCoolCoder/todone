@@ -1,5 +1,5 @@
 import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { Button, Card, Collapse, Fieldset, Grid, Group, OptionsDropdown, Select, Text } from "@mantine/core";
+import { Button, Card, Checkbox, Collapse, Fieldset, Grid, Group, OptionsDropdown, Select, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from '@mantine/modals';
 import { useContext, useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import AddTodoPopup from "~/components/Todo/AddTodoPopup";
 import TodoCard from "~/components/Todo/TodoCard";
 import { TodosContext } from "~/context/TodosContext";
+import { StateBundle } from "~/data/StateBundle";
 import { Todo } from "~/data/Todo";
 import db from "~/services/database";
 
@@ -41,22 +42,28 @@ export default function Index() {
                 <p>Todos</p>
                 <Button onClick={addTodo} variant="outline" color="white"><PlusIcon className="size-6" /></Button>
             </Group>
-            <br />
-            <TodoList hideDone={false}></TodoList>
+            <TodoList></TodoList>
         </TodosContext.Provider>
     </>
 }
 
-function TodoList({hideDone}: {hideDone: boolean}) {
+function TodoList() {
     const allTodos = useContext(TodosContext);
 
-    const displayedTodos = hideDone ? allTodos.val.filter(t => ! t.done) : allTodos.val;
+    // const init: FilterFn = ;
+    const [filterFn, setFilterFn] = useState<FilterFn>(() => (() => true)); // react is a funny fella, he thinks my intial state is a function to generate initial state
+    const [sortFn, setSortFn] = useState<SortFn>(() => ((a: Todo, b: Todo) => 1));
+
+    // debugger;
+
+    const displayedTodos = allTodos.val.filter(filterFn);
+    displayedTodos.sort(sortFn);
 
     return<>
-        <TodoListFilters />
+        <TodoListFilters setFilterFn={f => setFilterFn(() => f)} setSortFn={f => setSortFn(() => f)}/>
         <br />
         <Grid>
-            {allTodos.val.map(todo => 
+            {displayedTodos.map(todo => 
                 <Grid.Col key={todo.id}><TodoCard todo={todo} /></Grid.Col>
             )}
         </Grid>
@@ -66,30 +73,74 @@ function TodoList({hideDone}: {hideDone: boolean}) {
 }
 
 
-enum DoneFilteringOptions {
-    All,
-    Done,
-    NotDone
+
+
+type FilterFn = (a: Todo) => boolean;
+type SortFn = (a: Todo, b: Todo) => number;
+
+const statusFilterFns: Record<string, FilterFn> = {
+    "All": () => false,
+    "Done only": a => a.done,
+    "Not done only": a => ! a.done,
 }
 
-const names = {
-    [DoneFilteringOptions.All] : "All",
-    [DoneFilteringOptions.Done] : "Done",
-    [DoneFilteringOptions.NotDone] : "NotDone",
-};
+const sortFns: Record<string, SortFn> = {
+    "Title": (a, b) => a.title.localeCompare(b.title),
+    "Modified": (a, b) => a.body.localeCompare(b.body)
+}
 
-function TodoListFilters() {
+function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) => void, setSortFn: (a: SortFn) => void}) {
     const [opened, { toggle }] = useDisclosure(false);
 
-    const [doneFiltering, setDoneFiltering] = useState(DoneFilteringOptions.NotDone);
+    const [statusFilter, setStatusFilter] = useState("All");
+    // todo: date filter
+
+    const [sort, setSort] = useState("Title");
+    const [normalWay, setNormalWay] = useState(true);
+
+    function updateFilterFn() {
+        setFilterFn(statusFilterFns[statusFilter]);
+    }
+
+    function updateSortFn() {
+        setSortFn((a, b) => sortFns[sort](a, b) * (normalWay ? 1 : -1));
+    }
 
     return <>
         <Fieldset p="0">
-            <Group className="bg-neutral-700 px-4 cursor-pointer" onClick={toggle}>Filtering {opened ? <ChevronUpIcon className="size-6" /> : <ChevronDownIcon className="size-6" />}</Group>
+            <Group className="bg-neutral-700 px-4 cursor-pointer" onClick={toggle}>Filtering & Sorting
+                {opened ? <ChevronUpIcon className="size-6" /> : <ChevronDownIcon className="size-6" />}</Group>
 
             <Collapse in={opened}>
-                <div className="p-4">
-                filter yes hehe
+                <Stack align="flex-start" className="p-4">
+                    <Select data={Object.keys(statusFilterFns)}
+                        label="Show"
+                        value={statusFilter}
+                        onChange={v => {setStatusFilter(v ?? "All"); updateFilterFn()}}
+                        styles={{
+                            root: {
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: "20px"
+                            }
+                        }}/>
+                    <Group>
+                        <Select data={Object.keys(sortFns)}
+                            label="Sort by"
+                            value={sort}
+                            onChange={v => {setSort(v ?? "All"); updateSortFn()}}
+                            styles={{
+                                root: {
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: "20px"
+                                }
+                            }}/>
+                            <Checkbox label="Ascending order?" checked={normalWay} onChange={e => {setNormalWay(e.target.checked); updateSortFn()}} />
+                    </Group>
+                </Stack>
             </Collapse>
         </Fieldset>
     </>;
