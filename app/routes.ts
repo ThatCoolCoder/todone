@@ -5,6 +5,7 @@ export default [
     route("aaaaaaaaaaaa", "routes/tailwindender.tsx"),
     layout("routes/app/layout.tsx", prefix("app", [
         index("routes/app/index.tsx"),
+        route("tableview", "routes/app/tableview.tsx"),
         ...prefix("todos", [
             ...prefix(":id", [
                 route("history", "routes/app/todos/:id/history.tsx")

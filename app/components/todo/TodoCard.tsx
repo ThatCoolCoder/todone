@@ -9,6 +9,7 @@ import type { Todo } from "~/data/Todo";
 import db from "~/services/database";
 import OpenableCard from "~/components/misc/OpenableCard";
 import EditTodo from "./EditTodo";
+import { removeItem, updateItem } from "~/services/misc";
 
 export default function TodoCard({ todo }: { todo: Todo }) {
     const [edit, setEdit] = useState(false);
@@ -33,9 +34,7 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
     function updateTodo() {
         let newTodo = {...todo, ...editVals};
         db.todos.update(newTodo);
-        const clone = allTodos.val.concat([]);
-        clone.splice(clone.findIndex(t => t.id == todo.id), 1, newTodo);
-        allTodos.set(clone);
+        allTodos.set(updateItem(allTodos.val, todo));
     }
 
     function del() {
@@ -46,9 +45,7 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
             onCancel: () => {},
             onConfirm: () => {
                 db.todos.delete(todo.id);
-                const clone = allTodos.val.concat([]);
-                clone.splice(clone.findIndex(t => t.id == todo.id), 1);
-                allTodos.set(clone);
+                allTodos.set(removeItem(allTodos.val, todo));
             }
         })
     }
