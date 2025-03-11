@@ -3,25 +3,22 @@ import { Button, Card, Checkbox, Collapse, Fieldset, Grid, Group, OptionsDropdow
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from '@mantine/modals';
 import { useContext, useEffect, useState } from "react";
+import TodoSource from "~/components/contextsource/TodoSource";
 
-import AddTodoPopup from "~/components/Todo/AddTodoPopup";
-import TodoCard from "~/components/Todo/TodoCard";
+import AddTodoPopup from "~/components/todo/AddTodoPopup";
+import TodoCard from "~/components/todo/TodoCard";
 import { TodosContext } from "~/context/TodosContext";
-import { StateBundle } from "~/data/StateBundle";
 import { Todo } from "~/data/Todo";
-import db from "~/services/database";
 
 
 export default function Index() {
+    return <TodoSource><IndexInner /></TodoSource>;
+}
+
+function IndexInner() {
+    const todos = useContext(TodosContext);
+
     document.title = "Todos | Todone";
-
-    let [val, set] = useState([] as Todo[]);
-
-    useEffect(() => {
-        db.todos.getAll().then(d => set(d));
-    }, []);
-
-    const allTodos = {val, set};
 
     function addTodo() {
         modals.open({
@@ -30,20 +27,18 @@ export default function Index() {
             children: (
                 <>
                 {/* Modal is rendered in a portal (ie outside of context) so just give the data to him */}
-                    <AddTodoPopup allTodos={allTodos} />
+                    <AddTodoPopup allTodos={todos} />
                 </>
             )
         });
     }
 
     return <>
-        <TodosContext.Provider value={allTodos}>
-            <Group className="text-3xl mb-3" ml={0}>
-                <p>Todos</p>
-                <Button onClick={addTodo} variant="outline" color="white"><PlusIcon className="size-6" /></Button>
-            </Group>
-            <TodoList></TodoList>
-        </TodosContext.Provider>
+        <Group className="text-3xl mb-3" ml={0}>
+            <p>Todos</p>
+            <Button onClick={addTodo} variant="outline" color="white"><PlusIcon className="size-6" /></Button>
+        </Group>
+        <TodoList></TodoList>
     </>
 }
 

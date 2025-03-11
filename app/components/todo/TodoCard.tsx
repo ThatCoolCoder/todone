@@ -1,14 +1,14 @@
 import { ArrowTopRightOnSquareIcon, PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { Group, Text, Stack, Button, CheckIcon } from "@mantine/core";
+import { Button, CheckIcon, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useContext, useState } from "react";
+import { useNavigate } from "react-router";
+import { TodosContext } from "~/context/TodosContext";
+import { StateSetter } from "~/data/StateSetter";
 import type { Todo } from "~/data/Todo";
 import db from "~/services/database";
-import { TodosContext } from "~/context/TodosContext";
+import OpenableCard from "~/components/misc/OpenableCard";
 import EditTodo from "./EditTodo";
-import { StateSetter } from "~/data/StateSetter";
-import { useNavigate } from "react-router";
-import OpenableCard from "../Misc/OpenableCard";
 
 export default function TodoCard({ todo }: { todo: Todo }) {
     const [edit, setEdit] = useState(false);
