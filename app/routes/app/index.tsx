@@ -54,8 +54,6 @@ function TodoList() {
     const [filterFn, setFilterFn] = useState<FilterFn>(() => (() => true)); // react is a funny fella, he thinks my intial state is a function to generate initial state
     const [sortFn, setSortFn] = useState<SortFn>(() => ((a: Todo, b: Todo) => 1));
 
-    // debugger;
-
     const displayedTodos = allTodos.val.filter(filterFn);
     displayedTodos.sort(sortFn);
 
@@ -79,7 +77,7 @@ type FilterFn = (a: Todo) => boolean;
 type SortFn = (a: Todo, b: Todo) => number;
 
 const statusFilterFns: Record<string, FilterFn> = {
-    "All": () => false,
+    "All": () => true,
     "Done only": a => a.done,
     "Not done only": a => ! a.done,
 }
@@ -98,13 +96,13 @@ function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) =
     const [sort, setSort] = useState("Title");
     const [normalWay, setNormalWay] = useState(true);
 
-    function updateFilterFn() {
+    useEffect(() => {
         setFilterFn(statusFilterFns[statusFilter]);
-    }
+    }, [statusFilter]);
 
-    function updateSortFn() {
+    useEffect(() => {
         setSortFn((a, b) => sortFns[sort](a, b) * (normalWay ? 1 : -1));
-    }
+    }, [sort, normalWay]);
 
     return <>
         <Fieldset p="0">
@@ -116,7 +114,7 @@ function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) =
                     <Select data={Object.keys(statusFilterFns)}
                         label="Show"
                         value={statusFilter}
-                        onChange={v => {setStatusFilter(v ?? "All"); updateFilterFn()}}
+                        onChange={v => setStatusFilter(v ?? "All")}
                         styles={{
                             root: {
                                 display: "flex",
@@ -129,7 +127,7 @@ function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) =
                         <Select data={Object.keys(sortFns)}
                             label="Sort by"
                             value={sort}
-                            onChange={v => {setSort(v ?? "All"); updateSortFn()}}
+                            onChange={v => setSort(v ?? "All")}
                             styles={{
                                 root: {
                                     display: "flex",
@@ -138,7 +136,7 @@ function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) =
                                     gap: "20px"
                                 }
                             }}/>
-                            <Checkbox label="Ascending order?" checked={normalWay} onChange={e => {setNormalWay(e.target.checked); updateSortFn()}} />
+                            <Checkbox label="Ascending order?" checked={normalWay} onChange={e => setNormalWay(e.target.checked)} />
                     </Group>
                 </Stack>
             </Collapse>
