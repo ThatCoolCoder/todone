@@ -1,18 +1,24 @@
-import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { Button, Card, Checkbox, Collapse, Fieldset, Grid, Group, OptionsDropdown, Select, Stack, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { PlusIcon } from "@heroicons/react/20/solid";
+import { Button, Grid, Group, Text } from "@mantine/core";
 import { modals } from '@mantine/modals';
-import { useContext, useEffect, useState } from "react";
-import TodoSource from "~/components/contextsource/TodoSource";
+import { useContext, useState } from "react";
 
-import AddTodoPopup from "~/components/todo/AddTodoPopup";
-import TodoCard from "~/components/todo/TodoCard";
 import { TodosContext } from "~/context/TodosContext";
 import { Todo } from "~/data/Todo";
 
+import ChangeSource from "~/components/contextsource/ChangeSource";
+import TodoSource from "~/components/contextsource/TodoSource";
+import AddTodoPopup from "~/components/todo/AddTodoPopup";
+import TodoCard from "~/components/todo/TodoCard";
+import TodoListFilters, { FilterFn, SortFn } from "~/components/todo/TodoListFilter";
+
 
 export default function Index() {
-    return <TodoSource><IndexInner /></TodoSource>;
+    return <TodoSource>
+        <ChangeSource>
+            <IndexInner />
+        </ChangeSource>
+    </TodoSource>
 }
 
 function IndexInner() {
@@ -45,8 +51,10 @@ function IndexInner() {
 function TodoList() {
     const allTodos = useContext(TodosContext);
 
-    // const init: FilterFn = ;
-    const [filterFn, setFilterFn] = useState<FilterFn>(() => (() => true)); // react is a funny fella, he thinks my intial state is a function to generate initial state
+    // react is a funny fells, if i pass in a filter function he thinks it's a function to generate initial state
+    // (from TS we know that it cant be since inner returns true not FilterFn, but I guess typescript is leaking abstraction hmmm)
+    // therefore we give him a function that generates the function.
+    const [filterFn, setFilterFn] = useState<FilterFn>(() => (() => true));
     const [sortFn, setSortFn] = useState<SortFn>(() => ((a: Todo, b: Todo) => 1));
 
     const displayedTodos = allTodos.val.filter(filterFn);
@@ -65,76 +73,3 @@ function TodoList() {
     </>
 }
 
-
-
-
-type FilterFn = (a: Todo) => boolean;
-type SortFn = (a: Todo, b: Todo) => number;
-
-const statusFilterFns: Record<string, FilterFn> = {
-    "All": () => true,
-    "Done only": a => a.done,
-    "Not done only": a => ! a.done,
-}
-
-const sortFns: Record<string, SortFn> = {
-    "Title": (a, b) => a.title.localeCompare(b.title),
-    "Modified": (a, b) => a.body.localeCompare(b.body)
-}
-
-function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) => void, setSortFn: (a: SortFn) => void}) {
-    const [opened, { toggle }] = useDisclosure(false);
-
-    const [statusFilter, setStatusFilter] = useState("All");
-    // todo: date filter
-
-    const [sort, setSort] = useState("Title");
-    const [normalWay, setNormalWay] = useState(true);
-
-    useEffect(() => {
-        setFilterFn(statusFilterFns[statusFilter]);
-    }, [statusFilter]);
-
-    useEffect(() => {
-        setSortFn((a, b) => sortFns[sort](a, b) * (normalWay ? 1 : -1));
-    }, [sort, normalWay]);
-
-    return <>
-        <Fieldset p="0">
-            <Group className="bg-neutral-700 px-4 cursor-pointer" onClick={toggle}>Filtering & Sorting
-                {opened ? <ChevronUpIcon className="size-6" /> : <ChevronDownIcon className="size-6" />}</Group>
-
-            <Collapse in={opened}>
-                <Stack align="flex-start" className="p-4">
-                    <Select data={Object.keys(statusFilterFns)}
-                        label="Show"
-                        value={statusFilter}
-                        onChange={v => setStatusFilter(v ?? "All")}
-                        styles={{
-                            root: {
-                                display: "flex",
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: "20px"
-                            }
-                        }}/>
-                    <Group>
-                        <Select data={Object.keys(sortFns)}
-                            label="Sort by"
-                            value={sort}
-                            onChange={v => setSort(v ?? "All")}
-                            styles={{
-                                root: {
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    gap: "20px"
-                                }
-                            }}/>
-                            <Checkbox label="Ascending order?" checked={normalWay} onChange={e => setNormalWay(e.target.checked)} />
-                    </Group>
-                </Stack>
-            </Collapse>
-        </Fieldset>
-    </>;
-}
