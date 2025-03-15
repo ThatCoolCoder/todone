@@ -70,7 +70,7 @@ function TableViewInner() {
                 <Checkbox checked={editedTodo.done} onChange={e => setEditedTodo({...editedTodo, done: e.target.checked})} /> 
             </Table.Td>
             <Table.Td>
-                <Textarea value={editedTodo.body} onChange={v => setEditedTodo({...editedTodo, body: v.target.value})} />    
+                <TextInput value={editedTodo.body} onChange={v => setEditedTodo({...editedTodo, body: v.target.value})} />    
             </Table.Td>
             <Table.Td>
                 <Group gap={2}>

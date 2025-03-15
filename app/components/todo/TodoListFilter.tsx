@@ -46,7 +46,6 @@ export default function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: 
                     .sort((a, b) => b.timestamp - a.timestamp)[0]?.timestamp ?? 0
             }
         }
-        console.log('up date')
         return data;
     }, [todos, changes])
 

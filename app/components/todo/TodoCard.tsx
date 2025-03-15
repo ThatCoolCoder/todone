@@ -14,7 +14,7 @@ import { removeItem, updateItem } from "~/services/misc";
 export default function TodoCard({ todo }: { todo: Todo }) {
     const [edit, setEdit] = useState(false);
 
-    return <OpenableCard>
+    return <OpenableCard canChangeState={! edit} >
         <OpenableCard.Open>
             <BodyOpen todo={todo} edit={edit} setEdit={setEdit} />
         </OpenableCard.Open>
