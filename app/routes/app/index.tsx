@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 
 import { Todo } from "~/data/Todo";
 
-import ChangeSource from "~/components/contextsource/ChangeSource";
 import AddTodoPopup from "~/components/todo/AddTodoPopup";
 import TodoCard from "~/components/todo/TodoCard";
 import TodoListFilters, { FilterFn, SortFn } from "~/components/todo/TodoListFilter";
@@ -16,12 +15,6 @@ export default function Index() {
     const init = useTodoStore(store => store.init);
     useEffect(() => setInitialTodos(init), []);
 
-    return <ChangeSource>
-            <IndexInner />
-        </ChangeSource>
-}
-
-function IndexInner() {
     document.title = "Todos | Todone";
 
     function addTodo() {

@@ -1,30 +1,25 @@
 import { Card, Checkbox, Grid, Stack, Text } from "@mantine/core";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Todo } from "~/data/Todo";
-import { TodoChange, TodoChangeType, TodoEdited } from "~/data/TodoChange";
+import { TodoChangeType, TodoEdited } from "~/data/TodoChange";
 import db from "~/services/database";
 import { groupBy } from "~/services/misc";
 import { Route } from "../../+types";
-import ChangeSource from "~/components/contextsource/ChangeSource";
-import { ChangesContext } from "~/context/ChangesContext";
+import { setInitialChanges, useTodoChangeStore } from "~/context/TodoChangeState";
 
 export default function History(loaderData: Route.ComponentProps) {
-    document.title = "History | Todone";
+    const init = useTodoChangeStore(store => store.init);
+    useEffect(() => setInitialChanges(init), []);
 
+    const changes = useTodoChangeStore(store => store.changes);
     const id = Number(loaderData.params.id);
-
-    return <ChangeSource todoId={id}><HistoryInner id={id} /></ChangeSource>
-}
-
-function HistoryInner({id}: {id: number}) {
     const [todo, setTodo] = useState(null as Todo | null);
-
     useEffect(() => {
         db.todos.get(id).then(t => setTodo(t));
     }, []);
 
-    const changes = useContext(ChangesContext);
+    document.title = "History | Todone";
 
     return <>
         <p className="text-3xl">History for <Link to="/app/"><b>"{todo?.title ?? "---"}"</b></Link></p>
@@ -32,13 +27,16 @@ function HistoryInner({id}: {id: number}) {
         {changes == null ? <>
             Loading change list
         </> : <>
-            {changes.val.length == 0 ? <>
+            {changes.length == 0 ? <>
                 No Changes
             </> : <>
                 <ChangeList />
             </>}
         </>}
     </>
+}
+
+function HistoryInner({id}: {id: number}) {
 }
 
 type FieldEdit = {
@@ -54,12 +52,12 @@ type FieldEditSet = {
 }
 
 function ChangeList() {
-    const changes = useContext(ChangesContext);
+    const changes = useTodoChangeStore(store => store.changes);
 
     const [mostRecentFirst, setMostRecentFirst] = useState(true);
 
     const editSets: FieldEditSet[] = 
-        groupBy(changes.val, c => c.timestamp.toString() + "-" + c.type) // group by time
+        groupBy(changes, c => c.timestamp.toString() + "-" + c.type) // group by time
         .map(group => ({
             // convert 
             timestamp: group.items[0].timestamp,

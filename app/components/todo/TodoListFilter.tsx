@@ -4,8 +4,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { Checkbox, Collapse, Fieldset, Group, Select, Stack } from "@mantine/core";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import { StateBundle, makeStateBundle } from "~/data/StateBundle";
-import { ChangesContext } from "~/context/ChangesContext";
 import { useTodoStore } from "~/context/TodoState";
+import { useTodoChangeStore } from "~/context/TodoChangeState";
 
 export type FilterFn = (a: Todo) => boolean;
 export type SortFn = (a: Todo, b: Todo, c: Record<number, ExtraTodoData>) => number;
@@ -29,7 +29,7 @@ const sortFns: Record<string, SortFn> = {
 
 export default function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: (a: FilterFn) => void, setSortFn: (a: SortFn) => void}) {
     const [opened, { toggle }] = useDisclosure(false);
-    const changes = useContext(ChangesContext);
+    const changes = useTodoChangeStore(store => store.changes);
     const todos = useTodoStore(store => store.todos);
 
     const [statusFilter, setStatusFilter] = useState("All");
@@ -39,7 +39,7 @@ export default function TodoListFilters({setFilterFn, setSortFn}: {setFilterFn: 
     const extraTodoData = useMemo(() => {
         let data: Record<number, ExtraTodoData> = {};
         for (let todo of todos) {
-            let ourChanges = changes.val.filter(c => c.todoId == todo.id);
+            let ourChanges = changes.filter(c => c.todoId == todo.id);
             data[todo.id] = {
                 created: ourChanges.filter(c => c.type == "CREATED")[0]?.timestamp ?? 0,
                 modified: ourChanges
