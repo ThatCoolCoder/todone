@@ -1,3 +1,13 @@
+// Simple little "library" for a table-based database.
+// It is designed to work with localStorage or similar for persistence and has an interface similar to interacting with a rest API.
+// Not very efficient as it hits save/load for every transaction instead of keeping stuff in memory but it's fine for an app of this size.
+// To use, create a context type (used as TCtx) which contains some Tables (this is where the actual data is stored when its loaded).
+// Then create a TableMeta for each table, psssing it a function to get table, load context, save context, a reference to a db-wide action manager,
+// and optionally overrides (see below)
+
+// There is also the option to run an override for add/update/delete operations.
+// These allow adding extra functionality (eg change tracking), and by returning true/false they can determine whether the operation should continue or be skipped
+
 import { ActionManager } from "./actionManager";
 
 interface IHasId {

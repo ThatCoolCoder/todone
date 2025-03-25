@@ -4,8 +4,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { Checkbox, Collapse, Fieldset, Group, Select, Stack } from "@mantine/core";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import { StateBundle, makeStateBundle } from "~/data/StateBundle";
-import { useTodoStore } from "~/context/TodoState";
-import { useTodoChangeStore } from "~/context/TodoChangeState";
+import { useTodoStore } from "~/state/TodoState";
+import { useTodoChangeStore } from "~/state/TodoChangeState";
 
 export type FilterFn = (a: Todo) => boolean;
 export type SortFn = (a: Todo, b: Todo, c: Record<number, ExtraTodoData>) => number;

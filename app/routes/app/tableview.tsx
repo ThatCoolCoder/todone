@@ -2,7 +2,7 @@ import { TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { ActionIcon, Button, CheckIcon, Checkbox, Group, Table, TextInput, Textarea } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { setInitialTodos, useTodoStore } from "~/context/TodoState";
+import { setInitialTodos, useTodoStore } from "~/state/TodoState";
 import { Todo } from "~/data/Todo";
 
 export default function TableView() {

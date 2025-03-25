@@ -4,7 +4,7 @@ import { modals } from '@mantine/modals';
 import db from "~/services/database";
 import { StateBundle } from "~/data/StateBundle";
 import { Todo } from "~/data/Todo";
-import { useTodoStore } from "~/context/TodoState";
+import { useTodoStore } from "~/state/TodoState";
 
 export default function AddTodoPopup() {
     const [title, setTitle] = useState("");

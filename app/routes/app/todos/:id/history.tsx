@@ -6,7 +6,7 @@ import { TodoChangeType, TodoEdited } from "~/data/TodoChange";
 import db from "~/services/database";
 import { groupBy } from "~/services/misc";
 import { Route } from "../../+types";
-import { setInitialChanges, useTodoChangeStore } from "~/context/TodoChangeState";
+import { setInitialChanges, useTodoChangeStore } from "~/state/TodoChangeState";
 
 export default function History(loaderData: Route.ComponentProps) {
     const init = useTodoChangeStore(store => store.init);

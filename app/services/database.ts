@@ -2,6 +2,8 @@ import { Todo } from "~/data/Todo";
 import { Table, TableMeta } from "./databaseLibrary";
 import { TodoChange, TodoEdited } from "~/data/TodoChange";
 import { ActionManager } from "./actionManager";
+import { Tag } from "~/data/Tag";
+import { TagTodo } from "~/data/TagTodo";
 
 const localStorageKey = "todoneContext2";
 
@@ -17,6 +19,8 @@ function save(ctx: TodoneContext) {
 class TodoneContext {
     todos = new Table<Todo>();
     changes = new Table<TodoChange>();
+    tags = new Table<Tag>();
+    tagTodos = new Table<TagTodo>();
 }
 
 const actionManager = new ActionManager();
@@ -59,6 +63,8 @@ const db = {
         }
     }),
     changes: new TableMeta<TodoChange, TodoneContext>(c => c.changes, load, save, actionManager),
+    tags: new TableMeta<Tag, TodoneContext>(c => c.tags, load, save, actionManager),
+    tagTodos: new TableMeta<TagTodo, TodoneContext>(c => c.tagTodos, load, save, actionManager),
 }
 
 export default db;

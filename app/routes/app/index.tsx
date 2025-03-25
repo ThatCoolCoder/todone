@@ -8,7 +8,7 @@ import { Todo } from "~/data/Todo";
 import AddTodoPopup from "~/components/todo/AddTodoPopup";
 import TodoCard from "~/components/todo/TodoCard";
 import TodoListFilters, { FilterFn, SortFn } from "~/components/todo/TodoListFilter";
-import { setInitialTodos, useTodoStore } from "~/context/TodoState";
+import { setInitialTodos, useTodoStore } from "~/state/TodoState";
 
 
 export default function Index() {

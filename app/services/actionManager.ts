@@ -4,6 +4,18 @@ export type Action = {
     name: string,
 }
 
+// Class to orchestrate async actions which must not execute simultaneously, using a queue.
+// Runs actions in order of addition to the queue and supports queuing actions from inside other actions
+// An action can be any function, when it finishes its main work (immediately before return for instance), it should call onFinished to allow the next action to run
+// example usage:
+
+//  await actionManager.queue(() => {
+//      let data = loadFromSomewhere();
+//      data = process(data);
+//      actionManager.onFinished();
+//      return data;
+//  }, "load data")
+
 export class ActionManager {
     constructor(logging = false) {
         this.logging = logging;

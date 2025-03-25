@@ -9,7 +9,7 @@ import db from "~/services/database";
 import OpenableCard from "~/components/misc/OpenableCard";
 import EditTodo from "./EditTodo";
 import { removeItem, updateItem } from "~/services/misc";
-import { useTodoStore } from "~/context/TodoState";
+import { useTodoStore } from "~/state/TodoState";
 import { useShallow } from "zustand/shallow";
 
 export default function TodoCard({ todo }: { todo: Todo }) {
