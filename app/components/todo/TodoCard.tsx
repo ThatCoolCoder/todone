@@ -25,7 +25,7 @@ export default function TodoCard({ todo }: { todo: Todo }) {
 }
 
 function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: StateSetter<boolean>}) {
-    const [editVals, setEditVals] = useState({title: todo.title, body: todo.body, done: todo.done})
+    const [editVals, setEditVals] = useState({title: todo.title, body: todo.body, done: todo.done});
 
     const allTodos = useContext(TodosContext);
 

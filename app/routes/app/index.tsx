@@ -72,4 +72,3 @@ function TodoList() {
         {displayedTodos.length == 0 && <Text fz="large">No todos yet</Text>}
     </>
 }
-
