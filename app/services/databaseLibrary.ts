@@ -10,11 +10,11 @@
 
 import { ActionManager } from "./actionManager";
 
-interface IHasId {
+export interface IDbEntity {
     id: number
 }
 
-export class Table<TItem extends IHasId> {
+export class Table<TItem extends IDbEntity> {
     items: TItem[] = []
     nextId: number = 1
 }
@@ -31,7 +31,7 @@ type Action = {
     name: string,
 }
 
-export class TableMeta<TItem extends IHasId, TCtx> {
+export class TableMeta<TItem extends IDbEntity, TCtx> {
     constructor(
         getTable: (a: TCtx) => Table<TItem>,
         loadCtx: () => TCtx,

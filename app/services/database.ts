@@ -1,5 +1,5 @@
 import { Todo } from "~/data/Todo";
-import { Table, TableMeta } from "./databaseLibrary";
+import { IDbEntity, Table, TableMeta } from "./databaseLibrary";
 import { TodoChange, TodoEdited } from "~/data/TodoChange";
 import { ActionManager } from "./actionManager";
 import { Tag } from "~/data/Tag";
@@ -54,17 +54,28 @@ const db = {
             }
         },
         onDelete: todo => {
-            // cascading delete
-            db.changes.getAll().then(changes => {
-                changes
-                    .filter(c => c.todoId == todo.id)
-                    .forEach(c => db.changes.delete(c.id));
-            })
+            cascadingDelete(db.changes, todo, c => c.todoId);
+            cascadingDelete(db.tagTodos, todo, t => t.todoId);
         }
     }),
+    // for these three we could optionally choose to validate the relations on create/update but that is pointless for this app and would just be slow
     changes: new TableMeta<TodoChange, TodoneContext>(c => c.changes, load, save, actionManager),
-    tags: new TableMeta<Tag, TodoneContext>(c => c.tags, load, save, actionManager),
+    tags: new TableMeta<Tag, TodoneContext>(c => c.tags, load, save, actionManager, {
+        onDelete: tag => {
+            cascadingDelete(db.tagTodos, tag, t => t.tagId);
+        }
+    }),
     tagTodos: new TableMeta<TagTodo, TodoneContext>(c => c.tagTodos, load, save, actionManager),
 }
 
 export default db;
+
+function cascadingDelete<TParent extends IDbEntity, TChild extends IDbEntity>(
+        childTable: TableMeta<TChild, TodoneContext>, parent: TParent, getParentId: (c: TChild) => number) {
+
+    childTable.getAll().then(children => {
+        children
+            .filter(c => getParentId(c) == parent.id)
+            .forEach(c => childTable.delete(c.id));
+    })
+}
