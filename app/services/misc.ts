@@ -10,6 +10,10 @@ export function groupBy<T>(data: T[], groupFunc: (a: T) => string) {
         .map(k => ( {key: k, items: result[k]} ));
 }
 
+export function addItem<T>(data: T[], item: T) {
+    return data.concat([item]);
+}
+
 export function updateItem<T extends {id: number}>(data: T[], item: T) {
     const clone = [...data];
     clone.splice(clone.findIndex(t => t.id == item.id), 1, item);

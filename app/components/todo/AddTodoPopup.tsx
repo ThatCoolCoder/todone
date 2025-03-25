@@ -4,11 +4,14 @@ import { modals } from '@mantine/modals';
 import db from "~/services/database";
 import { StateBundle } from "~/data/StateBundle";
 import { Todo } from "~/data/Todo";
+import { useTodoStore } from "~/context/TodoState";
 
-export default function AddTodoPopup({allTodos}: {allTodos: StateBundle<Todo[]>}) {
+export default function AddTodoPopup() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [done, setDone] = useState(false);
+
+    const addTodo = useTodoStore(store => store.add);
 
     function save() {
         let todo = {
@@ -17,8 +20,7 @@ export default function AddTodoPopup({allTodos}: {allTodos: StateBundle<Todo[]>}
             body,
             done
         };
-        db.todos.add(todo);
-        allTodos.set(allTodos.val.concat([todo]));
+        addTodo(todo);
 
         modals.closeAll();
     }

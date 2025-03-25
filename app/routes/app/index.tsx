@@ -1,29 +1,27 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { Button, Grid, Group, Text } from "@mantine/core";
 import { modals } from '@mantine/modals';
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { TodosContext } from "~/context/TodosContext";
 import { Todo } from "~/data/Todo";
 
 import ChangeSource from "~/components/contextsource/ChangeSource";
-import TodoSource from "~/components/contextsource/TodoSource";
 import AddTodoPopup from "~/components/todo/AddTodoPopup";
 import TodoCard from "~/components/todo/TodoCard";
 import TodoListFilters, { FilterFn, SortFn } from "~/components/todo/TodoListFilter";
+import { setInitialTodos, useTodoStore } from "~/context/TodoState";
 
 
 export default function Index() {
-    return <TodoSource>
-        <ChangeSource>
+    const init = useTodoStore(store => store.init);
+    useEffect(() => setInitialTodos(init), []);
+
+    return <ChangeSource>
             <IndexInner />
         </ChangeSource>
-    </TodoSource>
 }
 
 function IndexInner() {
-    const todos = useContext(TodosContext);
-
     document.title = "Todos | Todone";
 
     function addTodo() {
@@ -33,7 +31,7 @@ function IndexInner() {
             children: (
                 <>
                 {/* Modal is rendered in a portal (ie outside of context) so just give the data to him */}
-                    <AddTodoPopup allTodos={todos} />
+                    <AddTodoPopup />
                 </>
             )
         });
@@ -49,7 +47,8 @@ function IndexInner() {
 }
 
 function TodoList() {
-    const allTodos = useContext(TodosContext);
+    const todos = useTodoStore(state => state.todos);
+
 
     // react is a funny fells, if i pass in a filter function he thinks it's a function to generate initial state
     // (from TS we know that it cant be since inner returns true not FilterFn, but I guess typescript is leaking abstraction hmmm)
@@ -57,7 +56,7 @@ function TodoList() {
     const [filterFn, setFilterFn] = useState<FilterFn>(() => (() => true));
     const [sortFn, setSortFn] = useState<SortFn>(() => ((a: Todo, b: Todo) => 1));
 
-    const displayedTodos = allTodos.val.filter(filterFn);
+    const displayedTodos = todos.filter(filterFn);
     displayedTodos.sort(sortFn);
 
     return<>

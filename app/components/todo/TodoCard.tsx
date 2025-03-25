@@ -3,13 +3,14 @@ import { Button, CheckIcon, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
-import { TodosContext } from "~/context/TodosContext";
 import { StateSetter } from "~/data/StateSetter";
 import type { Todo } from "~/data/Todo";
 import db from "~/services/database";
 import OpenableCard from "~/components/misc/OpenableCard";
 import EditTodo from "./EditTodo";
 import { removeItem, updateItem } from "~/services/misc";
+import { useTodoStore } from "~/context/TodoState";
+import { useShallow } from "zustand/shallow";
 
 export default function TodoCard({ todo }: { todo: Todo }) {
     const [edit, setEdit] = useState(false);
@@ -27,14 +28,20 @@ export default function TodoCard({ todo }: { todo: Todo }) {
 function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: StateSetter<boolean>}) {
     const [editVals, setEditVals] = useState({title: todo.title, body: todo.body, done: todo.done});
 
-    const allTodos = useContext(TodosContext);
+    const {todos, addTodo, updateTodo, removeTodo} = useTodoStore(
+        useShallow(state => ({
+            todos: state.todos,
+            addTodo: state.add,
+            updateTodo: state.update,
+            removeTodo: state.remove,
+        }))
+    );
 
     const navigate = useNavigate();
 
-    function updateTodo() {
+    function update() {
         let newTodo = {...todo, ...editVals};
-        db.todos.update(newTodo);
-        allTodos.set(updateItem(allTodos.val, todo));
+        updateTodo(newTodo);
     }
 
     function del() {
@@ -43,10 +50,7 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
             children: (<span>Are you sure you want to delete this todo?</span>),
             labels: { confirm: 'Confirm', cancel: 'Cancel' },
             onCancel: () => {},
-            onConfirm: () => {
-                db.todos.delete(todo.id);
-                allTodos.set(removeItem(allTodos.val, todo));
-            }
+            onConfirm: () => removeTodo(todo)
         })
     }
 
@@ -71,7 +75,7 @@ function BodyOpen({todo, edit, setEdit}: {todo: Todo, edit: boolean, setEdit: St
                 {edit ? 
                     <Button onClick={() => {
                         setEdit(false);
-                        updateTodo();
+                        update();
                     }} color="white" variant="outline" size="compact-md"><CheckIcon className="size-6" /></Button>
                     :
                     <Button onClick={() => setEdit(true)} color="white" variant="outline" size="compact-md"><PencilIcon className="size-6" /></Button>

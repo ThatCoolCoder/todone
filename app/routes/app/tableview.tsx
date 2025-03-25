@@ -1,18 +1,22 @@
 import { TrashIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { ActionIcon, Button, CheckIcon, Checkbox, Group, Table, TextInput, Textarea } from "@mantine/core";
-import { useContext, useMemo, useState } from "react";
-import TodoSource from "~/components/contextsource/TodoSource";
-import { TodosContext } from "~/context/TodosContext";
+import { useEffect, useMemo, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
+import { setInitialTodos, useTodoStore } from "~/context/TodoState";
 import { Todo } from "~/data/Todo";
-import db from "~/services/database";
-import { removeItem, updateItem } from "~/services/misc";
 
 export default function TableView() {
-    return <TodoSource><TableViewInner /></TodoSource>
-}
+    const init = useTodoStore(store => store.init);
+    useEffect(() => setInitialTodos(init), []);
 
-function TableViewInner() {
-    const todos = useContext(TodosContext);
+    const {todos, addTodo, updateTodo, removeTodo} = useTodoStore(
+        useShallow(state => ({
+            todos: state.todos,
+            addTodo: state.add,
+            updateTodo: state.update,
+            removeTodo: state.remove,
+        }))
+    );
 
     document.title = "Table View | Todone";
 
@@ -39,27 +43,19 @@ function TableViewInner() {
     }
 
     function save(todo: Todo) {
-        if (todo.id == -1) {
-            db.todos.add(todo);
-            todos.set(todos.val.concat([todo]))
-        } else {
-            db.todos.update(todo);
-            todos.set(updateItem(todos.val, todo));
-        }
+        if (todo.id == -1) addTodo(todo);
+        else updateTodo(todo);
         setEditedTodo(null);
     }
 
     function del(todo: Todo) {
-        if (todo.id != -1) {
-            db.todos.delete(todo.id);
-            todos.set(removeItem(todos.val, todo));
-        }
+        if (todo.id != -1) removeTodo(todo);
         setEditedTodo(null);
     }
 
     const displayed = useMemo(() => {
-        return (editedTodo != null && editedTodo.id == -1 ? [editedTodo] : []).concat(todos.val);
-    }, [todos.val, editedTodo]);
+        return (editedTodo != null && editedTodo.id == -1 ? [editedTodo] : []).concat(todos);
+    }, [todos, editedTodo]);
 
     const rows = displayed.map(todo => (editedTodo != null && editedTodo.id == todo.id) ? (
         <Table.Tr key={todo.id}>
