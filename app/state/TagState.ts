@@ -5,7 +5,7 @@ import { TagTodo } from '~/data/TagTodo';
 import db from '~/services/database';
 import { addItem, removeItem, updateItem } from '~/services/misc';
 
-interface TodoState {
+interface TagState {
     tags: Tag[],
     tagTodos: TagTodo[],
     init: (tags: Tag[], tagTodos: TagTodo[]) => void,
@@ -14,7 +14,7 @@ interface TodoState {
     remove: (t: Tag) => void,
 }
 
-export const useTodoStore = create<TodoState>()(set => ({
+export const useTagStore = create<TagState>()(set => ({
     tags: [],
     tagTodos: [],
     init: (tags, tagTodos) => set(() => {

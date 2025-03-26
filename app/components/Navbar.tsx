@@ -3,6 +3,7 @@ import { Link } from "react-router";
 const links: {name: string, path: string}[] = [
     {name: "Table view", path: "/app/tableview"},
     {name: "Landing page", path: "/"},
+    {name: "Manage tags", path: "/app/tags"},
 ]
 
 export default function Navbar() {

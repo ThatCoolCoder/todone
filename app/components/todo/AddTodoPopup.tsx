@@ -32,8 +32,8 @@ export default function AddTodoPopup() {
         </Group>
         <Textarea placeholder="Description" onChange={e => setBody(e.target.value)} />
         <Group justify="flex-end">
-            <Button variant="default" onClick={modals.closeAll}>Cancel</Button>
             <Button onClick={save}>Create</Button>
+            <Button variant="default" onClick={modals.closeAll}>Cancel</Button>
         </Group>
     </Stack>
 }

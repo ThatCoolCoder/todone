@@ -32,7 +32,7 @@ export default function OpenableCard({children, canChangeState}: {children?: Rea
             if (! canChangeState) return;
             e.preventDefault();
             setOpen(!open);
-        }}>
+        }} className="cursor-pointer">
         <OpenableCardContext.Provider value={contextValue}>
             {otherContent}
             {open && openContent != null && openContent}

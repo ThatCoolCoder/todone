@@ -21,12 +21,7 @@ export default function Index() {
         modals.open({
             title: "Add todo",
             size: "lg",
-            children: (
-                <>
-                {/* Modal is rendered in a portal (ie outside of context) so just give the data to him */}
-                    <AddTodoPopup />
-                </>
-            )
+            children: <AddTodoPopup />
         });
     }
 
