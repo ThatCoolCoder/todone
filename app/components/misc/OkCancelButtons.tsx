@@ -5,13 +5,13 @@ export default function OkCancelButtons({okText, cancelText, okAction, cancelAct
     {okText: string, cancelText?: string, okAction: () => void, cancelAction?: () => void, closeModal?: boolean}) {
     
     return <Group justify="flex-end">
-        <Button onClick={() => {
-            if (closeModal ?? true) modals.closeAll();
-            okAction();
-        }}>{okText}</Button>
         <Button variant="default" onClick={() => {
             if (closeModal ?? true) modals.closeAll();
             if (cancelAction) cancelAction();
         }}>{cancelText ?? "Cancel"}</Button>
+        <Button onClick={() => {
+            if (closeModal ?? true) modals.closeAll();
+            okAction();
+        }}>{okText}</Button>
     </Group>
 }

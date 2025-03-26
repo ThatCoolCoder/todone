@@ -1,6 +1,6 @@
 import { Todo } from "~/data/Todo";
 import { IDbEntity, Table, TableMeta } from "./databaseLibrary";
-import { TodoChange, TodoEdited } from "~/data/TodoChange";
+import { TodoChange, TodoEdited, TodoRelationUpdated } from "~/data/TodoChange";
 import { ActionManager } from "./actionManager";
 import { Tag } from "~/data/Tag";
 import { TagTodo } from "~/data/TagTodo";
@@ -41,7 +41,7 @@ const db = {
             for (let field of fields) {
                 if (old[field] == curr[field]) continue;
 
-                let change: TodoEdited = {
+                db.changes.add({
                     id: -1,
                     todoId: old.id,
                     type: "EDITED",
@@ -49,8 +49,7 @@ const db = {
                     field: field,
                     oldValue: String(old[field]),
                     newValue: String(curr[field])
-                };
-                db.changes.add(change);
+                } as TodoEdited);
             }
         },
         onDelete: todo => {
@@ -65,7 +64,24 @@ const db = {
             cascadingDelete(db.tagTodos, tag, t => t.tagId);
         }
     }),
-    tagTodos: new TableMeta<TagTodo, TodoneContext>(c => c.tagTodos, load, save, actionManager),
+    tagTodos: new TableMeta<TagTodo, TodoneContext>(c => c.tagTodos, load, save, actionManager, {
+        onAdd: tagTodo => {
+            db.changes.add({
+                type: "RELATION_UPDATED",
+                relatedEntityType: "TAG",
+                relatedEntityId: tagTodo.tagId,
+                updateType: "LINKED",
+            } as TodoRelationUpdated);
+        },
+        onDelete: tagTodo => {
+            db.changes.add({
+                type: "RELATION_UPDATED",
+                relatedEntityType: "TAG",
+                relatedEntityId: tagTodo.tagId,
+                updateType: "UNLINKED",
+            } as TodoRelationUpdated);
+        }
+    }),
 }
 
 export default db;
