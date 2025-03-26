@@ -1,6 +1,6 @@
 import { Todo } from "~/data/Todo";
 import { IDbEntity, Table, TableMeta } from "./databaseLibrary";
-import { TodoChange, TodoEdited, TodoRelationUpdated } from "~/data/TodoChange";
+import { TodoChange, TodoCreated, TodoEdited, TodoRelationUpdated } from "~/data/TodoChange";
 import { ActionManager } from "./actionManager";
 import { Tag } from "~/data/Tag";
 import { TagTodo } from "~/data/TagTodo";
@@ -28,12 +28,14 @@ const actionManager = new ActionManager();
 const db = {
     todos: new TableMeta<Todo, TodoneContext>(c => c.todos, load, save, actionManager, {
         onAdd: todo => {
-            db.changes.add({
+            // for some reason we don't get type checking for missing members unless its declared as a var then put in
+            let change: TodoCreated = {
                 id: -1,
                 todoId: todo.id,
                 type: "CREATED",
                 timestamp: Date.now()
-            });
+            };
+            db.changes.add(change);
         },
         onUpdate: (old, curr) => {
             const fields: (keyof Todo)[] = ["title", "body", "done"];
@@ -41,7 +43,7 @@ const db = {
             for (let field of fields) {
                 if (old[field] == curr[field]) continue;
 
-                db.changes.add({
+                let change: TodoEdited = {
                     id: -1,
                     todoId: old.id,
                     type: "EDITED",
@@ -49,7 +51,8 @@ const db = {
                     field: field,
                     oldValue: String(old[field]),
                     newValue: String(curr[field])
-                } as TodoEdited);
+                }
+                db.changes.add(change);
             }
         },
         onDelete: todo => {
@@ -66,20 +69,28 @@ const db = {
     }),
     tagTodos: new TableMeta<TagTodo, TodoneContext>(c => c.tagTodos, load, save, actionManager, {
         onAdd: tagTodo => {
-            db.changes.add({
+            let change: TodoRelationUpdated = {
+                id: -1,
+                todoId: tagTodo.todoId,
                 type: "RELATION_UPDATED",
+                timestamp: Date.now(),
                 relatedEntityType: "TAG",
                 relatedEntityId: tagTodo.tagId,
                 updateType: "LINKED",
-            } as TodoRelationUpdated);
+            }
+            db.changes.add(change);
         },
         onDelete: tagTodo => {
-            db.changes.add({
+            let change: TodoRelationUpdated = {
+                id: -1,
+                todoId: tagTodo.todoId,
                 type: "RELATION_UPDATED",
+                timestamp: Date.now(),
                 relatedEntityType: "TAG",
                 relatedEntityId: tagTodo.tagId,
                 updateType: "UNLINKED",
-            } as TodoRelationUpdated);
+            }
+            db.changes.add(change);
         }
     }),
 }
