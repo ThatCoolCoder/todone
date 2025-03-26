@@ -25,3 +25,9 @@ export function removeItem<T extends {id: number}>(data: T[], item: T) {
     clone.splice(clone.findIndex(t => t.id == item.id), 1);
     return clone;
 }
+
+export function removeFromArray<T>(data: T[], item: T) {
+    const clone = [...data];
+    clone.splice(clone.findIndex(t => t == item), 1);
+    return clone;
+}

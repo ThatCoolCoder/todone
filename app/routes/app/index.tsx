@@ -9,11 +9,16 @@ import AddTodoPopup from "~/components/todo/AddTodoPopup";
 import TodoCard from "~/components/todo/TodoCard";
 import TodoListFilters, { FilterFn, SortFn } from "~/components/todo/TodoListFilter";
 import { setInitialTodos, useTodoStore } from "~/state/TodoState";
+import { setInitialTags, useTagStore } from "~/state/TagState";
 
 
 export default function Index() {
     const init = useTodoStore(store => store.init);
-    useEffect(() => setInitialTodos(init), []);
+    const init2 = useTagStore(store => store.init);
+    useEffect(() => {
+        setInitialTodos(init);
+        setInitialTags(init2);
+    }, []);
 
     document.title = "Todos | Todone";
 

@@ -3,6 +3,7 @@ import { modals } from "@mantine/modals";
 import { f } from "node_modules/react-router/dist/development/fog-of-war-BALYJxf_.mjs";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
+import OkCancelButtons from "~/components/misc/OkCancelButtons";
 import TagBadge from "~/components/tag/TagBadge";
 import { Tag } from "~/data/Tag";
 import { setInitialTags, useTagStore } from "~/state/TagState";
@@ -61,7 +62,7 @@ function TagsTable() {
 
     const rows = tags.map(t => <Table.Tr key={t.id}>
         <Table.Td w="20ch">
-            <TagBadge text={t.title} color={t.color} />
+            <TagBadge tag={t} />
         </Table.Td>
         <Table.Td className="flex-1">
             {t.description}
@@ -97,12 +98,6 @@ function EditTagPopup({tag, saveFunc, saveText}: {tag: Tag, saveFunc: (a: Tag) =
         </Group>
         <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" />
 
-        <Group justify="flex-end">
-            <Button onClick={() => {
-                saveFunc({id: tag.id, title, description, color});
-                modals.closeAll();
-            }}>{saveText}</Button>
-            <Button variant="default" onClick={modals.closeAll}>Cancel</Button>
-        </Group>
+        <OkCancelButtons okText={saveText} okAction={() => saveFunc({id: tag.id, title, description, color})} />
     </Stack>
 }
